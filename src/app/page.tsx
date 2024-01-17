@@ -14,7 +14,7 @@ export default function Home() {
       <h1 className="max-w-4xl  text-5xl font-bold md:text-6xl lg:text-7xl">
         Chat with your <span className="text-blue-600">documents</span> in seconds.
       </h1>
-      <p className="mt-5 max-w-prose text-zinc-700 sm:text-lg">sakaPDF allows you to chat with your any PDF document. Simply upload your file and start asking questions rigth away.</p>
+      <p className="mt-5 max-w-prose text-zinc-700 sm:text-lg">sakaPDF allows you to chat with your any PDF document. Simply upload your file and start asking questions right away.</p>
       <Link href='/dashboard' target="_blank" className={buttonVariants({size: 'lg', className: 'mt-5'})}>Get started <ArrowRight className="ml-2" />
       </Link>
     </Container>
@@ -46,7 +46,7 @@ export default function Home() {
     <div className="mb-32 mt-32 sm:mt-56 max-w-5xl mx-auto">
       <div className="mb-12 px-6 lg:px-8">
         <div className="max-w-2xl mx-auto">
-          <h2 className="mt-2 font-bold text-4xl sm:text-5xl text-gray-900">Start chatting in <span className="text-blue-600">minutes.</span></h2>
+          <h2 className="mt-2 font-bold text-4xl sm:text-5xl text-gray-900">Start chatting in <span className="text-blue-600">seconds.</span></h2>
           <p className="mt-4 text-lg text-gray-600">Chatting with your PDF files has never been easier than this! Try sakaPDF today</p>
         </div>
       </div>
