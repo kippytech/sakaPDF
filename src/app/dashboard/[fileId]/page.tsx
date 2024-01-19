@@ -1,3 +1,6 @@
+'use client'
+
+import { trpc } from "@/app/_trpc/client"
 import ChatWrapper from "@/components/ChatWrapper"
 import PdfRenderer from "@/components/PdfRenderer"
 import { db } from "@/db"
@@ -10,25 +13,31 @@ interface ParamProps {
     }
 }
 
-async function FileId({params}: ParamProps) {
+function FileId({params}: ParamProps) {
     //retrieve the file id
     const {fileId} = params
 
     //check user auth
-    const {getUser} = getKindeServerSession()
-    const user = await getUser()
+    // const {getUser} = getKindeServerSession()
+    // const user = await getUser()
 
-    if (!user || !user.id) redirect(`/auth-callback?origin=dashboard/${fileId}`)
+    // if (!user || !user.id) redirect(`/auth-callback?origin=dashboard/${fileId}`)
 
     //make db call
-    const file = await db.file.findFirst({
-        where: {
-            id: fileId,
-            userId: user.id
-        },
-    })
+    // const file = await db.file.findFirst({
+    //     where: {
+    //         id: fileId,
+    //         userId: user.id
+    //     },
+    // })
 
-    if (!file) notFound()
+    // if (!file) notFound()
+
+    const {data: file, isLoading} = trpc.getFileForRender.useQuery({id: fileId})
+
+    if (!file) return 'no file'
+
+    console.log(file)
 
   return (
     <div className="flex-1 flex flex-col justify-between h-[calc(100vh-3.5rem)]">
@@ -36,7 +45,7 @@ async function FileId({params}: ParamProps) {
             {/*  left side */}
             <div className="flex-1 xl:flex">
                 <div className="px-4 py-6 sm:px-6 lg:pl-8 xl:pl-6 xl:flex-1">
-                    <PdfRenderer />
+                    <PdfRenderer url={file.url} />
                 </div>
             </div>
             {/*  right side */}
