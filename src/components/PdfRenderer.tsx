@@ -28,9 +28,6 @@ function PdfRenderer({ url }: PdfRendererProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const [zoom, setZoom] = useState(1)
   const [rotation, setRotation] = useState(0)
-  const [renderedScale, setRenderedScale] = useState<number | null>(null)
-
-  const isLoading = renderedScale !== zoom
 
   const pageValidator = z.object({
     page: z.string().refine((num) => Number(num) > 0 && Number(num) <= numPages!)
@@ -121,14 +118,9 @@ function PdfRenderer({ url }: PdfRendererProps) {
                 })
               }}
                 file={url} className='max-h-full'>
-                { isLoading && renderedScale ? (<Page key={'@' + renderedScale} pageNumber={currentPage} width={width ? width : 1} scale={zoom} rotate={rotation} />) : null }
-                <Page key={'@' + zoom} pageNumber={currentPage} width={width ? width : 1} scale={zoom} rotate={rotation} className={cn(isLoading ? 'hidden' : '')} loading={
-                  <div className='flex justify-center'>
-                    <Loader2 className='my-24 animate-spin' />
-                  </div>
-                } 
-                  onRenderSuccess={() => setRenderedScale(zoom)}
-                />
+                <div style={{transition: 'transform 0.3s ease-in-out', transformOrigin: '0 0'}}>
+                  <Page pageNumber={currentPage} width={width ? width : 1} scale={zoom} rotate={rotation} />
+                </div>
               </Document>
             </div>
           </SimpleBar>
