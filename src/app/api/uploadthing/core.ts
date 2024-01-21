@@ -31,7 +31,8 @@ export const ourFileRouter = {
     })
 
     try {
-      const res = await fetch(`https://uploadthing-prod.s3.us-west-2.amazonaws.com/${file.key}`)
+      //const res = await fetch(`https://uploadthing-prod.s3.us-west-2.amazonaws.com/${file.key}`)
+      const res = await fetch('https://www.pearsonhighered.com/assets/samplechapter/0/1/3/7/0137080387.pdf')
       const blob = await res.blob()
 
       //load pdf to memory
@@ -49,7 +50,7 @@ export const ourFileRouter = {
       //vectorize & index entire pdf
       //const pinecone = await getPineconeClient()
       const pineconeIndex = pinecone.index('sakapdf')
-      console.log(pineconeIndex)
+      console.log("pinecone HAPA: >>", pineconeIndex)
 
       const embeddings = new OpenAIEmbeddings({
         openAIApiKey: process.env.OPENAI_API_KEY
