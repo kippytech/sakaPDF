@@ -7,6 +7,7 @@ import { trpc } from '@/app/_trpc/client'
 import { ChevronLeft, Loader2, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { buttonVariants } from '../ui/button'
+import { ChatContextProvider } from './ChatContext'
 
 type ChatWrapperProps = {
   fileId: string
@@ -64,12 +65,14 @@ function ChatWrapper({ fileId }: ChatWrapperProps) {
   )
 
   return (
-    <div className='relative min-h-full bg-zinc-50 divide-y divide-zinc-200 flex gap-2 flex-col justify-between'>
-      <div className=' flex flex-1 justify-between flex-col mb-28'>
-        <Messages />
+    <ChatContextProvider fileId={fileId}>
+      <div className='relative min-h-full bg-zinc-50 divide-y divide-zinc-200 flex gap-2 flex-col justify-between'>
+        <div className=' flex flex-1 justify-between flex-col mb-28'>
+          <Messages />
+        </div>
+        <ChatInput />
       </div>
-      <ChatInput />
-    </div>
+    </ChatContextProvider>
   )
 }
 
