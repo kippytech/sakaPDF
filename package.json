@@ -11,6 +11,8 @@
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
     "@kinde-oss/kinde-auth-nextjs": "^2.1.2",
+    "@langchain/community": "^0.0.19",
+    "@langchain/openai": "^0.0.12",
     "@pinecone-database/pinecone": "^2.0.1",
     "@prisma/client": "^5.8.1",
     "@radix-ui/react-dialog": "^1.0.5",

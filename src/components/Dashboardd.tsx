@@ -16,13 +16,14 @@ function Dashboard() {
 
   const router = useRouter()
 
-  //const utils = trpc.useContext()
+  const utils = trpc.useContext()
 
   const {data: files, isLoading} = trpc.getUserFiles.useQuery()
 
   const {mutate} = trpc.deleteFile.useMutation({
     onSuccess: () => {
-       router.refresh()
+       //router.refresh()
+       utils.getUserFiles.invalidate()
    },
     onMutate ({id})  {
        setIsDeleting(id)

@@ -3,9 +3,9 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import {PDFLoader} from "langchain/document_loaders/fs/pdf"
 import { pinecone } from "@/lib/pinecone";
-import {OpenAIEmbeddings} from "langchain/embeddings/openai"
+import {OpenAIEmbeddings} from "@langchain/openai"
 //import { getPineconeClient } from '@/lib/pinecone'
-import {PineconeStore} from "langchain/vectorstores/pinecone"
+import {PineconeStore} from "@langchain/community/vectorstores/pinecone"
  
 const f = createUploadthing();
 
@@ -31,19 +31,25 @@ export const ourFileRouter = {
     })
 
     try {
-      const res = await fetch(file.url)
+      const res = await fetch(`https://uploadthing-prod.s3.us-west-2.amazonaws.com/${file.key}`)
       const blob = await res.blob()
 
       //load pdf to memory
-      const loader = new PDFLoader(blob)
+      let pageLevelContent: any
+      try {
+        const loader = new PDFLoader(blob)
 
-      const pageLevelContent = await loader.load()
+        pageLevelContent = await loader.load()
 
-      const pagesAmt = pageLevelContent.length
+        const pagesAmt = pageLevelContent.length
+      } catch (pdfError) {
+          console.error('SHIDA', pdfError)
+      }
 
       //vectorize & index entire pdf
       //const pinecone = await getPineconeClient()
-      const pinecondeIndex = pinecone.Index('sakapdf')
+      const pineconeIndex = pinecone.index('sakapdf')
+      console.log(pineconeIndex)
 
       const embeddings = new OpenAIEmbeddings({
         openAIApiKey: process.env.OPENAI_API_KEY
@@ -51,7 +57,7 @@ export const ourFileRouter = {
   
       await PineconeStore.fromDocuments(pageLevelContent, embeddings, 
         {
-          //@ts-ignore
+          
         pineconeIndex,
         //namespace: createdFile.id
         }
@@ -65,7 +71,7 @@ export const ourFileRouter = {
           id: createdFile.id
         }
       })
-    } catch (error) {
+
       await db.file.update({
         data: {
           uploadStatus: 'FAILED'
@@ -74,6 +80,9 @@ export const ourFileRouter = {
           id: createdFile.id
         }
       })
+
+    } catch (error) {
+      console.error("Error processing file:", error);
     }
 
   }),
