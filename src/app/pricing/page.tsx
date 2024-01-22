@@ -106,7 +106,7 @@ const Pricing = async () => {
                                 <div className='h-20 flex items-center justify-center border-b border-t border-gray-200 bg-gray-50'>
                                     <div className='flex items-center space-x-1'>
                                         <p>{quota.toLocaleString()} PDFs per month included</p>
-                                        <Tooltip delayDurattion={300}>
+                                        <Tooltip delayDuration={300}>
                                             <TooltipTrigger className='cursor-default ml-1.5'>
                                                 <HelpCircle className="h-4 w-4 text-zinc-500" />
                                             </TooltipTrigger>
@@ -131,7 +131,7 @@ const Pricing = async () => {
                                                     <p className={cn('text-gray-400', {
                                                         'text-gray-600': negative
                                                     })}>{text}</p>
-                                                    <Tooltip delayDurattion={300}>
+                                                    <Tooltip delayDuration={300}>
                                                         <TooltipTrigger className='cursor-default ml-1.5'>
                                                             <HelpCircle className="h-4 w-4 text-zinc-500" />
                                                         </TooltipTrigger>

@@ -2,10 +2,10 @@ import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import {PDFLoader} from "langchain/document_loaders/fs/pdf"
-import { pinecone } from "@/lib/pinecone";
-import {OpenAIEmbeddings} from "@langchain/openai"
-//import { getPineconeClient } from '@/lib/pinecone'
-import {PineconeStore} from "@langchain/community/vectorstores/pinecone"
+//import { pinecone } from "@/lib/pinecone";
+import {OpenAIEmbeddings} from "langchain/embeddings/openai"
+import { getPineconeClient } from '@/lib/pinecone'
+import {PineconeStore} from "langchain/vectorstores/pinecone"
  
 const f = createUploadthing();
 
@@ -48,8 +48,8 @@ export const ourFileRouter = {
       }
 
       //vectorize & index entire pdf
-      //const pinecone = await getPineconeClient()
-      const pineconeIndex = pinecone.index('sakapdf')
+      const pinecone = await getPineconeClient()
+      const pineconeIndex = pinecone.Index('sakapdf')
       console.log("pinecone HAPA: >>", pineconeIndex)
 
       const embeddings = new OpenAIEmbeddings({
@@ -58,7 +58,7 @@ export const ourFileRouter = {
   
       await PineconeStore.fromDocuments(pageLevelContent, embeddings, 
         {
-          
+          //@ts-ignore
         pineconeIndex,
         //namespace: createdFile.id
         }
