@@ -11,7 +11,7 @@ import { useToast } from "./ui/use-toast"
 import { trpc } from "@/app/_trpc/client"
 import { useRouter } from "next/navigation"
 
-const UploadDropzone = () => {
+const UploadDropzone = ({isSubscribed}: {isSubscribed: boolean}) => {
 
     const [isUploading, setIsUploading] = useState(true)
     const [uploadProgress, setUploadProgress] = useState(0)
@@ -20,7 +20,7 @@ const UploadDropzone = () => {
 
     const router = useRouter()
 
-    const {startUpload} = useUploadThing('imageUploader')
+    const {startUpload} = useUploadThing(isSubscribed ? 'proPlanUploader' : 'freePlanUploader')
 
     const {mutate: startPolling} = trpc.getFile.useMutation({
         onSuccess: (file) => {
@@ -90,7 +90,7 @@ const UploadDropzone = () => {
                                     <p className="mb-2 text-sm text-zinc-700">
                                         <span className="font-semibold">Click to upload </span>or drag and drop.
                                     </p>
-                                    <p className="text-sm text-zinc-500">PDF (up to 4MB)</p>
+                                    <p className="text-sm text-zinc-500">PDF (up to {isSubscribed ? '16' : '4'} MB)</p>
                                 </div>
                                 { acceptedFiles && acceptedFiles[0] ? (
                                     <div className="max-w-sm bg-white flex items-center rounded-md  overflow-hidden outline-[1px] outline-zinc-200 divide-x divide-zinc-200">
@@ -125,7 +125,7 @@ const UploadDropzone = () => {
     )
 }
 
-function UploadButton() {
+function UploadButton({isSubscribed}: {isSubscribed: boolean}) {
     const [isOpen, setIsOpen] = useState(false)
   return (
     <Dialog open={isOpen} onOpenChange={(v) => { if (!v) {setIsOpen(v)}}}>
@@ -133,7 +133,7 @@ function UploadButton() {
             <Button>Upload PDF</Button>
         </DialogTrigger>
         <DialogContent>
-            <UploadDropzone />
+            <UploadDropzone isSubscribed={isSubscribed} />
         </DialogContent>
     </Dialog>
   )
