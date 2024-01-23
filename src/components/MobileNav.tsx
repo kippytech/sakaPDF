@@ -27,7 +27,7 @@ function MobileNav({ isAuth }: {isAuth: boolean}) {
     <div className='sm:hidden'>
         <Menu onClick={toggleOpen} className='relative z-50 h-5 w-5 text-zinc-700' />
         {isOpen ? (
-            <div className='fixed animate-in slide-in-from-top-5 fade-in-20 z-0 w-full'>
+            <div className='fixed inset-0 animate-in slide-in-from-top-5 fade-in-20 z-0 '>
                 <ul className='absolute bg-white border-b border-zinc-200 shadow-xl grid w-full gap-3 px-10 pt-20 pb-8'>
                     {!isAuth ? (
                         <>
@@ -47,6 +47,10 @@ function MobileNav({ isAuth }: {isAuth: boolean}) {
                         <>
                             <li>
                                 <Link onClick={() => closeOnCurrent('/dashboard')} href='/dashboard' className='flex items-center w-full font-semibold text-green-600'>Dashboard </Link>
+                            </li>
+                            <li className='my-3 h-1 w-full bg-gray-300' />
+                            <li>
+                                <Link onClick={() => closeOnCurrent('/pricing')} href='/pricing' className='flex items-center w-full font-semibold text-green-600'>Pricing </Link>
                             </li>
                             <li className='my-3 h-1 w-full bg-gray-300' />
                             <li>
