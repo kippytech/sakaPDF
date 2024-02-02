@@ -32,9 +32,10 @@ function PdfFullscreen({ fileUrl }: PdfFullscreenProps) {
         </DialogTrigger>
         <DialogContent className='max-w-7xl w-full'>
             <SimpleBar autoHide={false} className='max-h-[calc(100vh-10rem)] mt-6'>
+              <div ref={ref}>
                 
               <Document onLoadSuccess={ ({numPages}) => setNumPages(numPages) } loading={
-                <div className='flex justify-center '>
+                <div className='flex justify-center  '>
                   <Loader2 className='my-24 animate-spin' />
                 </div>
               } onLoadError={() => {
@@ -50,6 +51,7 @@ function PdfFullscreen({ fileUrl }: PdfFullscreenProps) {
                 )) }
               </Document>
             
+            </div>
             </SimpleBar>
         </DialogContent>
     </Dialog>

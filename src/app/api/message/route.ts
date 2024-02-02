@@ -1,4 +1,5 @@
 import { db } from "@/db";
+import { getContext } from "@/lib/context";
 import { openai } from "@/lib/openai";
 import { pinecone } from "@/lib/pinecone";
 import { sendMessageValidator } from "@/lib/validators/sendMessageValidator";
@@ -40,19 +41,22 @@ export async function POST (req: NextRequest) {
     })
 
     //vectorize message
-    const embeddings = new OpenAIEmbeddings({
-        openAIApiKey: process.env.OPENAI_API_KEY
-    })
+    // const embeddings = new OpenAIEmbeddings({
+    //     openAIApiKey: process.env.OPENAI_API_KEY
+    // })
 
-    const pineconeIndex = pinecone.index('sakapdf')
+    //const pineconeIndex = pinecone.index('sakapdf')
+    const results = await getContext(message)
 
     //search vector store for the most relevant part
-    const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
-        pineconeIndex,
-        //namespace: file.id
-    })
+    // const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
+    //     pineconeIndex,
+    //     //namespace: file.id
+    // })
 
-    const results = await vectorStore.similaritySearch(message, 4)
+    // const results = await vectorStore.similaritySearch(message, 4)
+    //would have used results here below
+    //${results.map((r) => r.pageContent).join('\n\n')}
 
     const prevMessages = await db.message.findMany({
         where: {
@@ -96,7 +100,8 @@ export async function POST (req: NextRequest) {
         \n----------------\n
         
         CONTEXT:
-        ${results.map((r) => r.pageContent).join('\n\n')}
+        
+        ${results}
         
         USER INPUT: ${message}`,
             },

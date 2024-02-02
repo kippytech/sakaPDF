@@ -2,12 +2,16 @@ import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import {PDFLoader} from "langchain/document_loaders/fs/pdf"
-//import { pinecone } from "@/lib/pinecone";
+import { pinecone } from "@/lib/pinecone";
 import {OpenAIEmbeddings} from "langchain/embeddings/openai"
-import { getPineconeClient } from '@/lib/pinecone'
+//import { getPineconeClient } from '@/lib/pinecone'
 import {PineconeStore} from "langchain/vectorstores/pinecone"
 import { getUserSubscriptionPlan } from "@/lib/stripe";
 import { PLANS } from "@/config/stripe";
+import { getEmbedding } from "@/lib/openai";
+import {Document, RecursiveCharacterTextSplitter} from '@pinecone-database/doc-splitter'
+import { PineconeRecord } from "@pinecone-database/pinecone";
+import md5 from "md5"
  
 const f = createUploadthing();
 
@@ -50,7 +54,7 @@ const onUploadComplete = async ({ metadata, file }: { metadata: Awaited<ReturnTy
     const res = await fetch('https://www.pearsonhighered.com/assets/samplechapter/0/1/3/7/0137080387.pdf')
     const blob = await res.blob()
 
-    //load pdf to memory
+    //1. load pdf to memory
     let pageLevelContent: any
     try {
       const loader = new PDFLoader(blob)
@@ -81,22 +85,41 @@ const onUploadComplete = async ({ metadata, file }: { metadata: Awaited<ReturnTy
         console.error('SHIDA', pdfError)
     }
 
-    //vectorize & index entire pdf
-    const pinecone = await getPineconeClient()
-    const pineconeIndex = pinecone.Index('sakapdf')
-    console.log("pinecone HAPA: >>", pineconeIndex)
+    //2. split & segment pdf
+    const documents = await Promise.all(pageLevelContent.map(prepareDocument))
 
-    const embeddings = new OpenAIEmbeddings({
-      openAIApiKey: process.env.OPENAI_API_KEY
-    })
+    //3. vectorize & embed entire pdf(individual documents)
+    //const vectors = await  Promise.all(documents.flat().map(embedDocument))
+    const vectors = await processDocuments(documents)
 
-    await PineconeStore.fromDocuments(pageLevelContent, embeddings, 
-      {
-        //@ts-ignore
-      pineconeIndex,
-      //namespace: createdFile.id
-      }
-    )
+    //4. upload to pinecone
+    //const pinecone = await getPineconeClient()
+    const pdfIndex = pinecone.Index('sakapdf')
+    //console.log("pinecone HAPA: >>", pdfIndex)
+    await pdfIndex.upsert(vectors)
+    console.log('pinecone HAPA: >>>', pdfIndex)
+
+    //return documents[0]
+
+    // const embeddings = new OpenAIEmbeddings({
+    //   openAIApiKey: process.env.OPENAI_API_KEY
+    // })
+
+    //const embeddings = await getEmbedding(pageLevelContent)
+
+    // await PineconeStore.fromDocuments(pageLevelContent, embeddings, 
+    //   {
+    //     //@ts-ignore
+    //   pineconeIndex,
+    //   //namespace: createdFile.id
+    //   }
+    // )
+
+  //   await pdfIndex.upsert([{
+  //      id: createdFile.id,
+  //      values: embeddings,
+  //      //metadata: {createdFile.}
+  // }])
 
     await db.file.update({
       data: {
@@ -133,33 +156,83 @@ export const ourFileRouter = {
  
 export type OurFileRouter = typeof ourFileRouter;
 
- 
-//const auth = (req: Request) => ({ id: "fakeId" }); // Fake auth function
- 
-// FileRouter for your app, can contain multiple FileRoutes
-//export const ourFileRouter = {
-  // Define as many FileRoutes as you like, each with a unique routeSlug
-  //imageUploader: f({ image: { maxFileSize: "4MB" } })
-    // Set permissions and file types for this FileRoute
-    //.middleware(async ({ req }) => {
-      // This code runs on your server before upload
-      //const user = await auth(req);
- 
-      // If you throw, the user will not be able to upload
-      //if (!user) throw new Error("Unauthorized");
- 
-      // Whatever is returned here is accessible in onUploadComplete as `metadata`
-      //return { userId: user.id };
-    //})
-    //.onUploadComplete(async ({ metadata, file }) => {
-      // This code RUNS ON YOUR SERVER after upload
-      //console.log("Upload complete for userId:", metadata.userId);
- 
-      //console.log("file url", file.url);
- 
-      // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
-//       return { uploadedBy: metadata.userId };
-//     }),
-// } satisfies FileRouter;
- 
-// export type OurFileRouter = typeof ourFileRouter;
+async  function embedDocument(doc: Document) {
+  try {
+    const embeddings = await getEmbedding(doc.pageContent)
+    const hash = md5(doc.pageContent)
+
+    return {
+      id: hash,
+      values: embeddings,
+      metadata: {
+        text: doc.metadata.text,
+        pageNumber: doc.metadata.page
+      }
+    } as PineconeRecord
+  } catch (error) {
+    console.log('error embedding the doc', error)
+    throw error
+  }
+}
+
+export const truncateStringByBytes = (str: string, bytes: number) => {
+  const enc = new TextEncoder()
+  return new TextDecoder('utf-8').decode(enc.encode(str).slice(0, bytes))
+}
+
+type PDFPage = {
+  pageContent: string;
+  metadata: {
+    loc: {pageNumber: number}
+  }
+}
+
+async function prepareDocument(page: PDFPage) {
+  let {pageContent, metadata} = page
+  pageContent = pageContent.replace(/\n/, '')
+
+  //split the docs
+  const splitter = new RecursiveCharacterTextSplitter()
+  
+  const docs = await splitter.splitDocuments([
+    new Document({
+      pageContent,
+      metadata: {
+        pageNumber: metadata.loc.pageNumber,
+        text: truncateStringByBytes(pageContent, 36000)
+      }
+    })
+  ])
+
+  return docs
+}
+
+async function processDocuments(documents: Document[]) {
+  const vectors = [];
+  for (const document of documents.flat()) {
+      try {
+          // Process each document and get its vector
+          const vector = await embedDocument(document);
+          vectors.push(vector);
+      } catch (error: any) {
+          console.error('Error processing document:', error)
+          // Check if the error is due to rate limiting
+          if (error.code === 'rate_limit_exceeded') {
+            console.log('Rate limit exceeded. Retrying after 30 seconds...');
+            // Retry after a longer delay
+            await delay(30000); // 30 seconds delay
+            // Retry processing the current document
+            continue;
+        } else {
+            // For other types of errors, rethrow the error
+            throw error;
+        }
+    }
+      
+  }
+  return vectors;
+}
+
+function delay(ms: any) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

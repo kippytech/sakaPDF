@@ -59,7 +59,7 @@ function Messages({ fileId }: MessagesProps) {
       { combinedMessages && combinedMessages.length > 0 ? (
         combinedMessages.map((mssg, i) => {
 
-          const isNextMessageSamePerson = combinedMessages[i - 1].isUserMessage === combinedMessages[i].isUserMessage
+          const isNextMessageSamePerson = combinedMessages[i - 1]?.isUserMessage === combinedMessages[i]?.isUserMessage
 
           if (i === combinedMessages.length-1) {
             return <Message isNextMessageSamePerson={isNextMessageSamePerson} message={mssg} key={mssg.id} ref={ref} />
