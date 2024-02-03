@@ -17,18 +17,19 @@ function BillingForm({subscriptionPlan}: BillingFormProps) {
 
     const {toast} = useToast()
 
-    const { mutate: createStripeSession, isLoading } = trpc.createStripeSession.useMutation()
-    //     onSuccess: ({ url }) => {
-    //         if(url) window.location.href = url 
-    //         if (!url) {
-    //             toast({
-    //                 title: 'There was a problem...',
-    //                 description: 'Please try again in a moment',
-    //                 variant: 'destructive'
-    //             })
-    //         }
-    //     }
-    // })
+    const { mutate: createStripeSession, isLoading } = trpc.createStripeSession.useMutation({
+        //@ts-ignore
+        onSuccess: ({ url }) => {
+            if(url) window.location.href = url 
+            if (!url) {
+                toast({
+                    title: 'There was a problem...',
+                    description: 'Please try again in a moment',
+                    variant: 'destructive'
+                })
+            }
+        }
+    })
 
   return (
     <Container className="max-w-5xl">
