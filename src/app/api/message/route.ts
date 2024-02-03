@@ -82,7 +82,7 @@ export async function POST (req: NextRequest) {
             {
               role: 'system',
               content:
-                'Use the following pieces of context (or previous conversaton if needed) to answer the users question in markdown format.',
+                'Use the following pieces of context (or previous conversaton if needed) to answer the users question in markdown format. The AI assistant is knowledgeable and clever. When asked a question such as this document or this pdf the AI is able to decipher that the user is implying the context provided and the AI should not respond with answers that suggest it does not have the context since the context shall have been provided by the time the user interacts with the AI. So basically any question is referring to the provided context. However, the AI should not make up answers if it does not know or have enough context',
             },
             {
               role: 'user',
