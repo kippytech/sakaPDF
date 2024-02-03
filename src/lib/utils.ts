@@ -60,3 +60,8 @@ export function generateMetadata({
     })
   }
 }
+
+export function convertToAscii(inputString: string) {
+  const asciistring = inputString.replace(/[^\x00-\x7F]+/g, '')
+  return asciistring
+}

@@ -46,7 +46,7 @@ export async function POST (req: NextRequest) {
     // })
 
     //const pineconeIndex = pinecone.index('sakapdf')
-    const results = await getContext(message)
+    const results = await getContext(message, fileId)
 
     //search vector store for the most relevant part
     // const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {

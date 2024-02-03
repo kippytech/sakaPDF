@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import UploadButton from './UploadButton'
 import { trpc } from '@/app/_trpc/client'
 import { Ghost, Loader2, MessageSquare, Plus, Trash } from 'lucide-react'
@@ -27,7 +27,7 @@ function Dashboard({subscriptionPlan}: DashboardProps) {
 
   const {mutate} = trpc.deleteFile.useMutation({
     onSuccess: () => {
-       //router.refresh()
+       router.refresh()
        utils.getUserFiles.invalidate()
    },
     onMutate ({id})  {
@@ -37,11 +37,10 @@ function Dashboard({subscriptionPlan}: DashboardProps) {
        setIsDeleting(null)
     } 
   })
-  //  in the useMutation =>> {
-  //   onSuccess: () => {
-  //     utils.getUserFiles.invalidate()
-  //   }
-  // }
+  
+  useEffect(() => {
+    router.refresh()
+  }, [files, router])
 
   return (
     <main className='max-w-7xl mx-auto md:p-10'>

@@ -12,6 +12,7 @@ import { getEmbedding } from "@/lib/openai";
 import {Document, RecursiveCharacterTextSplitter} from '@pinecone-database/doc-splitter'
 import { PineconeRecord } from "@pinecone-database/pinecone";
 import md5 from "md5"
+import { convertToAscii } from "@/lib/utils";
  
 const f = createUploadthing();
 
@@ -50,8 +51,9 @@ const onUploadComplete = async ({ metadata, file }: { metadata: Awaited<ReturnTy
   })
 
   try {
-    //const res = await fetch(`https://uploadthing-prod.s3.us-west-2.amazonaws.com/${file.key}`)
-    const res = await fetch('https://www.pearsonhighered.com/assets/samplechapter/0/1/3/7/0137080387.pdf')
+    //const res = await fetch(`https://uploadthing-prod.s3.us-west-2.amazonaws.com/${file.key}`) 
+    const res = await fetch(createdFile.url)  
+    //const res = await fetch('https://files.eric.ed.gov/fulltext/EJ1216485.pdf')
     const blob = await res.blob()
 
     //1. load pdf to memory
@@ -94,9 +96,10 @@ const onUploadComplete = async ({ metadata, file }: { metadata: Awaited<ReturnTy
 
     //4. upload to pinecone
     //const pinecone = await getPineconeClient()
-    const pdfIndex = pinecone.Index('sakapdf')
+    const pdfIndex = pinecone.Index('pdf')
     //console.log("pinecone HAPA: >>", pdfIndex)
-    await pdfIndex.upsert(vectors)
+    const namespace = pdfIndex.namespace(convertToAscii(createdFile.id))
+    await namespace.upsert(vectors)
     console.log('pinecone HAPA: >>>', pdfIndex)
 
     //return documents[0]

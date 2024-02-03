@@ -1,10 +1,12 @@
 import { getEmbedding } from "./openai"
 import { pinecone } from "./pinecone"
+import { convertToAscii } from "./utils"
 
 export async function getMatchesFromEmbeddings(embeddings: number[], fileId?: string) {
     try {
-        const pdfIndex = pinecone.index('sakapdf')
-        const queryResult = await pdfIndex.query({
+        const pdfIndex = pinecone.index('pdf')
+        const namespace = pdfIndex.namespace(convertToAscii(fileId!))
+        const queryResult = await namespace.query({
             topK: 5,
             vector: embeddings,
             includeMetadata: true
@@ -18,7 +20,7 @@ export async function getMatchesFromEmbeddings(embeddings: number[], fileId?: st
 
 export async function getContext(query: string, fileId?: string) {
   const queryEmbeddings = await getEmbedding(query)
-  const matches = await getMatchesFromEmbeddings(queryEmbeddings)
+  const matches = await getMatchesFromEmbeddings(queryEmbeddings, fileId)
 
   const qualifyingDocs = matches.filter((match) => match.score && match.score > 0.7)
 
