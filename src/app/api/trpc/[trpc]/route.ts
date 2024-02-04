@@ -3,13 +3,13 @@ import {fetchRequestHandler} from '@trpc/server/adapters/fetch'
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextRequest, NextResponse } from "next/server";
 
-const createContext = async (req: NextRequest) => {
+//const createContext = async (req: NextRequest) => {
   //@ts-ignore
-  return createNextContext({
-    headers: req.headers,
-    cookies: req.cookies
-  })
-}
+//   return createNextContext({
+//     headers: req.headers,
+//     cookies: req.cookies
+//   })
+// }
 
 const handler = (req: Request, res: NextApiResponse) =>  {
   //cors
