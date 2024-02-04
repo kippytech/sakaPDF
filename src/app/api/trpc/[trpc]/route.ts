@@ -11,7 +11,7 @@ import { NextRequest, NextResponse } from "next/server";
 //   })
 // }
 
-const handler = (req: Request, res: NextApiResponse) =>  {
+const handler = async (req: Request, res: NextApiResponse): Promise<any> =>  {
   //cors
   // if (req.method === 'OPTIONS') {
   //   return new NextResponse('Cors Verified', {
