@@ -30,7 +30,7 @@
     "@trpc/react-query": "^10.45.0",
     "@trpc/server": "^10.45.0",
     "@types/md5": "^2.3.2",
-    "@uploadthing/react": "^6.2.2",
+    "@uploadthing/react": "^6.1.0",
     "add": "^2.0.6",
     "ai": "^2.2.31",
     "class-variance-authority": "^0.7.0",

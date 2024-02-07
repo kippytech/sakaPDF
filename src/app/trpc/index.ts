@@ -39,11 +39,15 @@ export const appRouter = router({
     getUserFiles: privateProcedure.query(async ({ ctx }) => {
         const {userId} = ctx
 
-        return await db.file.findMany({
+        const files =  await db.file.findMany({
             where: {
                 userId: userId
             }
         })
+
+        if (files.length === 0) throw new TRPCError({code: 'NOT_FOUND'})
+
+        return files
     }),
     createStripeSession: privateProcedure.mutation(async ({ctx}) => {
         const {userId} = ctx
