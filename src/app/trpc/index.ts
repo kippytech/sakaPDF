@@ -50,6 +50,7 @@ export const appRouter = router({
         return files
     }),
     createStripeSession: privateProcedure.mutation(async ({ctx}) => {
+        try {
         const {userId} = ctx
 
         //cant use relative urls in server
@@ -94,6 +95,9 @@ export const appRouter = router({
         })
 
         return { url: stripeSession.url }
+    } catch (error) {
+        console.log(error)
+    }
     }),
     getFileMessages: privateProcedure.input(
         z.object({
