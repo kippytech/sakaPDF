@@ -96,8 +96,8 @@ export const appRouter = router({
 
         return { url: stripeSession.url }
     } catch (error) {
+        console.error('error bwana>>', error)
         throw error
-        console.log(error)
     }
     }),
     getFileMessages: privateProcedure.input(
