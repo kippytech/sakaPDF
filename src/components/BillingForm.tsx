@@ -47,11 +47,11 @@ function BillingForm({subscriptionPlan}: BillingFormProps) {
                         {isLoading ? (
                             <Loader2 className="mr-4 h-4 w-4 animate-spin" />
                         ) : null }
-                        {subscriptionPlan.isSubscribed ? 'Manage Subscription' : 'Upgrade to Pro'}
+                        {subscriptionPlan.isSubscribed ? 'Manage Subscription' : 'Upgrade to PRO'}
                     </Button>
                     {subscriptionPlan.isSubscribed ? (
                         <p className="rounded-full text-xs font-medium">
-                            {subscriptionPlan.isCanceled ? 'Your plan will be canceled on ' : 'Your plan renews on'}
+                            {subscriptionPlan.isCanceled ? 'Your plan will be canceled on ' : 'Your plan renews on '}
                             {format(subscriptionPlan.stripeCurrentPeriodEnd!, 'dd.MM.yyyy')}.
                         </p>
                     ) : null }
