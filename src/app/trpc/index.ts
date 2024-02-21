@@ -96,6 +96,7 @@ export const appRouter = router({
 
         return { url: stripeSession.url }
     } catch (error) {
+        throw error
         console.log(error)
     }
     }),
